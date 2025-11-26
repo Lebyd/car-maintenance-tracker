@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Olex Kurochka",
+    "email": "oleksandr@gmail.com",
+    "role": "owner"
+  },
+  {
+    "id": 2,
+    "name": "Mechanic Mike",
+    "email": "mike@garage.com",
+    "role": "mechanic"
+  },
+  {
+    "id": 3,
+    "name": "Test User",
+    "email": "test@abc.com",
+    "role": "owner"
+  }
+]

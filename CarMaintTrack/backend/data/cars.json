@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "ownerId": 1,
+    "brand": "BMW",
+    "model": "340i",
+    "year": 2016,
+    "vin": "WBA8B7G54GNT00001",
+    "licensePlate": "ABC-123",
+    "currentMileage": 145000
+  },
+  {
+    "id": 2,
+    "ownerId": 1,
+    "brand": "Audi",
+    "model": "A4",
+    "year": 2018,
+    "vin": "WAUENAF45JN000001",
+    "licensePlate": "XYZ-789",
+    "currentMileage": 98000
+  },
+  {
+    "id": 3,
+    "ownerId": 1,
+    "brand": "Honda",
+    "model": "CRV",
+    "year": 2009,
+    "vin": "123456789101",
+    "licensePlate": "TEST-123",
+    "currentMileage": 50000
+  }
+]

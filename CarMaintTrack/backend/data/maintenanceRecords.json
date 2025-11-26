@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "carId": 1,
+    "serviceType": "Oil change",
+    "serviceDate": "2025-09-10",
+    "mileageAtService": 140000,
+    "cost": 120,
+    "notes": "Used 5W-30 synthetic oil",
+    "performedBy": "Mechanic Mike"
+  },
+  {
+    "id": 2,
+    "carId": 1,
+    "serviceType": "Brake pads replacement",
+    "serviceDate": "2025-10-01",
+    "mileageAtService": 143500,
+    "cost": 350,
+    "notes": "Front pads & rotors",
+    "performedBy": "Mechanic Mike"
+  }
+]

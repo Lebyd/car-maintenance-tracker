@@ -2,6 +2,8 @@ require("dotenv").config(); // load .env
 
 const express = require("express");
 
+const cors = require("cors");
+
 const usersRouter = require("./modules/users/users-routes");
 const carsRouter = require("./modules/cars/cars-routes");
 const maintenanceRouter = require("./modules/maintenance/maintenance-routes");
@@ -11,6 +13,7 @@ const notFoundHandler = require("./shared/middlewares/not-found");
 const errorHandler = require("./shared/middlewares/error-handler");
 
 const app = express();
+app.use(cors());
 const PORT = 3000;
 
 app.use(express.json());

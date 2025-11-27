@@ -1,125 +1,76 @@
-Car Maintenance Tracker
-Phase 2 & Phase 3 – Backend API (Express + MongoDB)
+Phase 4 – Frontend (React)
+Car Maintenance Tracker – Modern Web Project
 
-A backend application for managing users, cars, and maintenance records.
-Built using Node.js, Express, and MongoDB (Mongoose) with a clean modular folder structure.
+This phase implements the frontend user interface for the Car Maintenance Tracker using React (Vite).
+The UI communicates with the backend API created in Phases 2–3 (Node.js + Express + MongoDB).
 
-This repository currently includes:
- Phase 2: Modular backend + CRUD + validation
- Phase 3: MongoDB integration + advanced filtering/pagination
+The frontend includes:
+ Cars Page – full CRUD + filters + sorting
+ Users Page – full CRUD
+ Maintenance Page – full CRUD + filters
+ Navigation bar between pages
+ Connection to backend API using Axios
+ State management using React hooks (useState, useEffect)
+ Basic responsive UI styling
 
- Project Overview
+Backend Connection
+Axios client is configured in: src/api/apiClient.js:
 
-The Car Maintenance Tracker allows:
-Creating and managing users (owners, mechanics, admin)
-Adding and updating cars linked to specific users
-Recording maintenance history for each car
-Searching, filtering, and paginating data
+CORS was enabled in backend (server.js): app.use(cors());
 
-Phase 3 – MongoDB Integration & Enhancements
+Navigation (React Router)
+The app uses React Router to switch between pages.
 
-Phase 3 improved the backend with MongoDB Atlas and Mongoose, replacing JSON file storage.
+App.jsx:
+<Routes>
+  <Route path="/" element={<CarsPage />} />
+  <Route path="/users" element={<UsersPage />} />
+  <Route path="/maintenance" element={<MaintenancePage />} />
+</Routes>
 
- MongoDB & Mongoose Setup
+Navigation bar:
+<nav className="navbar">
+  <Link to="/">Cars</Link>
+  <Link to="/users">Users</Link>
+  <Link to="/maintenance">Maintenance</Link>
+</nav>
 
-Connection string stored safely in .env:
-MONGODB_URI="mongodb+srv://<USER>:<PASS>@<cluster>.mongodb.net/CarMaintTrackDB"
+Cars Page – Features
+Location: src/pages/CarsPage.jsx
 
-Connection is handled inside:
-backend/shared/middlewares/connect-db.js
-
-Mongoose Models
-
-All models now use MongoDB collections:
-
-User
-
-Car
-
-MaintenanceRecord
-
-Each model preserves the numeric id from Phase 2 for compatibility.
-
- Advanced Car Query API
-
-GET /cars now supports:
-
-Filters:
-ownerId
-brand
-model
-minYear / maxYear
-minMileage / maxMileage
-
+ Features:
+View all cars
+Add new car
+Delete car
+Advanced filtering:
+    ownerId
+    brand
+    minYear / maxYear
 Sorting:
-sortBy = year | currentMileage | brand | createdAt
-sortOrder = asc | desc
+    by year
+    by brand
+    by mileage
+    ascending / descending
 
-Pagination:
-page
-pageSize
+Success & error messages
 
-Example:
-/cars?brand=BMW&minYear=2015&page=1&pageSize=5&sortBy=year&sortOrder=desc
-
-
- Folder Structure
- backend/
-├── data/                     
-│
-├── modules/
-│   ├── users/
-│   ├── cars/
-│   └── maintenance/
-│
-├── shared/
-│   ├── middlewares/
-│   └── utils/
-│
-├── server.js
-├── .env
-├── package.json
-└── package-lock.json
-
+Clean UI layout (cards, tables, alerts)
+API endpoints used:
+GET    /users
+POST   /users
+DELETE /users/:id
 
 How to Run
 1 Install dependencies
-cd backend
+cd frontend
 npm install
 
-2 Add .env file
-Inside backend/.env: MONGODB_URI="mongodb+srv://<USER>:<PASS>@<cluster>.mongodb.net/CarMaintTrackDB"
+2 Start development server
+npm run dev
 
-3️ Start the server
+Backend must also be running:
+cd backend
 node server.js
 
-API Endpoints:
-
-Users
-GET    /users
-GET    /users/:id
-POST   /users
-PUT    /users/:id
-DELETE /users/:id
-
-Cars
-GET    /cars
-GET    /cars/:id
-GET    /cars?ownerId=1
-POST   /cars
-PUT    /cars/:id
-DELETE /cars/:id
-
-Advanced:
-GET /cars?brand=BMW&minYear=2018&page=1&pageSize=5&sortBy=year&sortOrder=desc
-
-Maintenance Records
-GET    /maintenance
-GET    /maintenance/:id
-GET    /maintenance?carId=1
-POST   /maintenance
-PUT    /maintenance/:id
-DELETE /maintenance/:id
-
-Author
+Author 
 Oleksandr Kurochka

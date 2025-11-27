@@ -15,19 +15,35 @@ const {
 
 const carsRouter = express.Router();
 
-// GET /cars
-// optional: /cars?ownerId=1
+/**
+ * GET /cars
+ * Supports filters & pagination via query params:
+ * - ownerId
+ * - brand, model
+ * - minYear, maxYear
+ * - minMileage, maxMileage
+ * - page, pageSize
+ * - sortBy, sortOrder
+ */
 carsRouter.get("/cars", async (req, res, next) => {
   try {
-    const ownerId = req.query.ownerId ? Number(req.query.ownerId) : null;
-
-    if (ownerId) {
-      const cars = await getCarsByOwner(ownerId);
+    // If only ownerId is provided and no other filters,
+    // you can still use getCarsByOwner (optional optimization)
+    if (
+      req.query.ownerId &&
+      !req.query.brand &&
+      !req.query.model &&
+      !req.query.minYear &&
+      !req.query.maxYear &&
+      !req.query.minMileage &&
+      !req.query.maxMileage
+    ) {
+      const cars = await getCarsByOwner(Number(req.query.ownerId));
       return res.json(cars);
     }
 
-    const cars = await getAllCars();
-    res.json(cars);
+    const result = await getAllCars(req.query);
+    res.json(result);
   } catch (error) {
     next(error);
   }

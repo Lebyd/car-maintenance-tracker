@@ -1,56 +1,72 @@
-const { readJson, writeJson } = require("../../shared/utils/file-utils");
+const mongoose = require("mongoose");
 
-const USERS_FILE = "data/users.json";
+const userSchema = new mongoose.Schema(
+  {
+    id: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      minlength: 2,
+    },
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: ["owner", "mechanic", "admin"],
+      default: "owner",
+    },
+  },
+  { timestamps: true }
+);
+
+const UserModel = mongoose.model("User", userSchema);
+
+async function getNextUserId() {
+  const lastUser = await UserModel.findOne().sort({ id: -1 }).lean();
+  return lastUser ? lastUser.id + 1 : 1;
+}
 
 async function getAllUsers() {
-  return await readJson(USERS_FILE);
+  return await UserModel.find().lean();
 }
 
 async function getUserById(id) {
-  const users = await getAllUsers();
-  return users.find((u) => u.id === id) || null;
+  return await UserModel.findOne({ id }).lean();
 }
 
 async function createUser(data) {
-  const users = await getAllUsers();
-  const newId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1;
+  const newId = await getNextUserId();
 
-  const newUser = {
+  const user = await UserModel.create({
     id: newId,
     name: data.name,
     email: data.email,
     role: data.role || "owner",
-  };
+  });
 
-  users.push(newUser);
-  await writeJson(USERS_FILE, users);
-  return newUser;
+  return user.toObject();
 }
 
 async function updateUser(id, data) {
-  const users = await getAllUsers();
-  const index = users.findIndex((u) => u.id === id);
+  const updated = await UserModel.findOneAndUpdate({ id }, data, {
+    new: true,
+    lean: true,
+  });
 
-  if (index === -1) return null;
-
-  users[index] = {
-    ...users[index],
-    ...data,
-  };
-
-  await writeJson(USERS_FILE, users);
-  return users[index];
+  return updated; // null if not found
 }
 
 async function deleteUser(id) {
-  const users = await getAllUsers();
-  const index = users.findIndex((u) => u.id === id);
-
-  if (index === -1) return false;
-
-  users.splice(index, 1);
-  await writeJson(USERS_FILE, users);
-  return true;
+  const result = await UserModel.deleteOne({ id });
+  return result.deletedCount > 0;
 }
 
 module.exports = {

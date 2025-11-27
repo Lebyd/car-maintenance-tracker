@@ -1,167 +1,125 @@
-# Car Maintenance Tracker – Phase 2  
-### Modular Express Architecture with JSON Data Storage
+Car Maintenance Tracker
+Phase 2 & Phase 3 – Backend API (Express + MongoDB)
 
-## Project Overview
-Car Maintenance Tracker is a backend application built using Node.js and Express.js.  
-It allows managing users, cars, and maintenance records.  
-This phase focuses on building a modular Express architecture, implementing CRUD operations, validation, and using JSON files.
+A backend application for managing users, cars, and maintenance records.
+Built using Node.js, Express, and MongoDB (Mongoose) with a clean modular folder structure.
 
----
+This repository currently includes:
+ Phase 2: Modular backend + CRUD + validation
+ Phase 3: MongoDB integration + advanced filtering/pagination
 
-## Phase 2 – Completed Tasks
+ Project Overview
 
-### 1. Data Structure Created
-Three JSON files were created to serve as the initial data source:
-backend/data/users.json
-backend/data/cars.json
-backend/data/maintenanceRecords.json
+The Car Maintenance Tracker allows:
+Creating and managing users (owners, mechanics, admin)
+Adding and updating cars linked to specific users
+Recording maintenance history for each car
+Searching, filtering, and paginating data
 
-Each file contains meaningful sample data representing the entities used in the system.
+Phase 3 – MongoDB Integration & Enhancements
 
----
+Phase 3 improved the backend with MongoDB Atlas and Mongoose, replacing JSON file storage.
 
-### 2. Modular Architecture Implemented
-The project follows a feature-based module structure, as required in Phase 2:
-modules/
-models/
-routes/
-middlewares/
+ MongoDB & Mongoose Setup
+
+Connection string stored safely in .env:
+MONGODB_URI="mongodb+srv://<USER>:<PASS>@<cluster>.mongodb.net/CarMaintTrackDB"
+
+Connection is handled inside:
+backend/shared/middlewares/connect-db.js
+
+Mongoose Models
+
+All models now use MongoDB collections:
+
+User
+
+Car
+
+MaintenanceRecord
+
+Each model preserves the numeric id from Phase 2 for compatibility.
+
+ Advanced Car Query API
+
+GET /cars now supports:
+
+Filters:
+ownerId
+brand
+model
+minYear / maxYear
+minMileage / maxMileage
+
+Sorting:
+sortBy = year | currentMileage | brand | createdAt
+sortOrder = asc | desc
+
+Pagination:
+page
+pageSize
+
+Example:
+/cars?brand=BMW&minYear=2015&page=1&pageSize=5&sortBy=year&sortOrder=desc
 
 
-Modules created:
-- users
-- cars
-- maintenance
-
----
-
-### 3. CRUD Logic Implemented in Models
-Each model handles business logic and JSON data operations:
-
-- `getAll<Entity>()`
-- `get<Entity>ById(id)`
-- `create<Entity>(data)`
-- `update<Entity>(id, data)`
-- `delete<Entity>(id)`
-
-All read/write operations are done using the filesystem (`fs`) through a shared utility.
-
----
-
-### 4. Independent Routes Implemented
-Each module uses **Express Router** and includes:
-
-- `GET /<entity>`
-- `GET /<entity>/:id`
-- `POST /<entity>`
-- `PUT /<entity>/:id`
-- `DELETE /<entity>/:id`
-
-All routes correctly return JSON responses and use appropriate HTTP status codes.
-
----
-
-### 5. Input Validation Added (express-validator)
-Validation rules were applied for POST and PUT requests for each entity:
-
-- Required fields
-- Email validation
-- Numeric and date validation
-- Role constraints
-- Empty field restrictions
-
-Invalid requests return **400 Bad Request** with a list of validation errors.
-
----
-
-### 6. Application-Level Middlewares Added
-Implemented in `server.js`:
-
-- `express.json()`  
-- `express.urlencoded({ extended: true })`
-- 404 Not Found handler
-- Global error-handling middleware
-
----
-
-### 7. Endpoints Tested using Postman
-Verified:
-
-- GET returns correct JSON data
-- POST successfully creates new entries
-- PUT updates entries
-- DELETE removes entries
-- Validation properly blocks invalid requests
-- 404 handler returns JSON error
-- Error handler works correctly
-
----
-
-## Project Structure (Phase 2)
-backend/
-├── data/
-│ ├── users.json
-│ ├── cars.json
-│ └── maintenanceRecords.json
+ Folder Structure
+ backend/
+├── data/                     
 │
 ├── modules/
-│ ├── users/
-│ │ ├── users-model.js
-│ │ ├── users-routes.js
-│ │ └── middlewares/users-validation.js
-│ │
-│ ├── cars/
-│ │ ├── cars-model.js
-│ │ ├── cars-routes.js
-│ │ └── middlewares/cars-validation.js
-│ │
-│ └── maintenance/
-│ ├── maintenance-model.js
-│ ├── maintenance-routes.js
-│ └── middlewares/maintenance-validation.js
+│   ├── users/
+│   ├── cars/
+│   └── maintenance/
 │
 ├── shared/
-│ ├── utils/file-utils.js
-│ └── middlewares/
-│ ├── not-found.js
-│ └── error-handler.js
+│   ├── middlewares/
+│   └── utils/
 │
 ├── server.js
-└── package.json
+├── .env
+├── package.json
+└── package-lock.json
 
----
 
-## How to Run
-
+How to Run
+1 Install dependencies
 cd backend
 npm install
+
+2 Add .env file
+Inside backend/.env: MONGODB_URI="mongodb+srv://<USER>:<PASS>@<cluster>.mongodb.net/CarMaintTrackDB"
+
+3️ Start the server
 node server.js
 
+API Endpoints:
+
+Users
 GET    /users
 GET    /users/:id
 POST   /users
 PUT    /users/:id
 DELETE /users/:id
 
+Cars
 GET    /cars
-GET    /cars?ownerId=1
 GET    /cars/:id
+GET    /cars?ownerId=1
 POST   /cars
 PUT    /cars/:id
 DELETE /cars/:id
 
+Advanced:
+GET /cars?brand=BMW&minYear=2018&page=1&pageSize=5&sortBy=year&sortOrder=desc
+
+Maintenance Records
 GET    /maintenance
-GET    /maintenance?carId=1
 GET    /maintenance/:id
+GET    /maintenance?carId=1
 POST   /maintenance
 PUT    /maintenance/:id
 DELETE /maintenance/:id
 
-## Team Member Contributions
-
+Author
 Oleksandr Kurochka
-
-
-
-
-

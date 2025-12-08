@@ -10,13 +10,18 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      minlength: 2,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
-      lowercase: true,
+      unique: true,
       trim: true,
+    },
+    // NEW: store hashed password here
+    password: {
+      type: String,
+      default: null,
     },
     role: {
       type: String,
@@ -24,49 +29,64 @@ const userSchema = new mongoose.Schema(
       default: "owner",
     },
   },
-  { timestamps: true }
+  {
+    collection: "users",
+    timestamps: true,
+  }
 );
 
 const UserModel = mongoose.model("User", userSchema);
 
-async function getNextUserId() {
-  const lastUser = await UserModel.findOne().sort({ id: -1 }).lean();
-  return lastUser ? lastUser.id + 1 : 1;
-}
-
+// Get all users
 async function getAllUsers() {
-  return await UserModel.find().lean();
+  return UserModel.find().sort({ id: 1 }).lean();
 }
 
+// Get user by numeric id
 async function getUserById(id) {
-  return await UserModel.findOne({ id }).lean();
+  return UserModel.findOne({ id }).lean();
 }
 
+// Create new user
 async function createUser(data) {
-  const newId = await getNextUserId();
+  // find max id
+  const last = await UserModel.findOne().sort({ id: -1 }).lean();
+  const nextId = last ? last.id + 1 : 1;
 
-  const user = await UserModel.create({
-    id: newId,
+  const user = new UserModel({
+    id: nextId,
     name: data.name,
     email: data.email,
+    password: data.password || null, // important for auth
     role: data.role || "owner",
   });
 
-  return user.toObject();
+  const saved = await user.save();
+  return saved.toObject();
 }
 
+// Update user
 async function updateUser(id, data) {
-  const updated = await UserModel.findOneAndUpdate({ id }, data, {
-    new: true,
-    lean: true,
-  });
+  const updated = await UserModel.findOneAndUpdate(
+    { id },
+    {
+      $set: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.email !== undefined && { email: data.email }),
+        ...(data.password !== undefined && { password: data.password }),
+        ...(data.role !== undefined && { role: data.role }),
+      },
+    },
+    { new: true, lean: true }
+  );
 
-  return updated; // null if not found
+  return updated;
 }
 
+// Delete user
 async function deleteUser(id) {
-  const result = await UserModel.deleteOne({ id });
-  return result.deletedCount > 0;
+  const res = await UserModel.deleteOne({ id });
+  return res.deletedCount > 0;
 }
 
 module.exports = {

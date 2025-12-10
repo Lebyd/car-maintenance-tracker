@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    // NEW: store hashed password here
+    // Hashed password (bcrypt)
     password: {
       type: String,
       default: null,
@@ -27,6 +27,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["owner", "mechanic", "admin"],
       default: "owner",
+    },
+    // MFA fields (OTP)
+    otpCode: {
+      type: String,
+      default: null,
+    },
+    otpExpiresAt: {
+      type: Date,
+      default: null,
     },
   },
   {
@@ -47,9 +56,13 @@ async function getUserById(id) {
   return UserModel.findOne({ id }).lean();
 }
 
+// OPTIONAL: get by email (можеш не використовувати, але хай буде)
+async function getUserByEmail(email) {
+  return UserModel.findOne({ email }).lean();
+}
+
 // Create new user
 async function createUser(data) {
-  // find max id
   const last = await UserModel.findOne().sort({ id: -1 }).lean();
   const nextId = last ? last.id + 1 : 1;
 
@@ -57,26 +70,30 @@ async function createUser(data) {
     id: nextId,
     name: data.name,
     email: data.email,
-    password: data.password || null, // important for auth
+    password: data.password || null,
     role: data.role || "owner",
+    otpCode: data.otpCode || null,
+    otpExpiresAt: data.otpExpiresAt || null,
   });
 
   const saved = await user.save();
   return saved.toObject();
 }
 
-// Update user
+// Update user (включає OTP-поля!)
 async function updateUser(id, data) {
+  const update = {};
+
+  if (data.name !== undefined) update.name = data.name;
+  if (data.email !== undefined) update.email = data.email;
+  if (data.password !== undefined) update.password = data.password;
+  if (data.role !== undefined) update.role = data.role;
+  if (data.otpCode !== undefined) update.otpCode = data.otpCode;
+  if (data.otpExpiresAt !== undefined) update.otpExpiresAt = data.otpExpiresAt;
+
   const updated = await UserModel.findOneAndUpdate(
     { id },
-    {
-      $set: {
-        ...(data.name !== undefined && { name: data.name }),
-        ...(data.email !== undefined && { email: data.email }),
-        ...(data.password !== undefined && { password: data.password }),
-        ...(data.role !== undefined && { role: data.role }),
-      },
-    },
+    { $set: update },
     { new: true, lean: true }
   );
 
@@ -92,6 +109,7 @@ async function deleteUser(id) {
 module.exports = {
   getAllUsers,
   getUserById,
+  getUserByEmail,
   createUser,
   updateUser,
   deleteUser,

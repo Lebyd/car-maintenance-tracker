@@ -1,53 +1,56 @@
 import { useState } from "react";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
+
 import CarsPage from "./pages/CarsPage";
 import UsersPage from "./pages/UsersPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import LoginPage from "./pages/LoginPage";
 
 function App() {
+  // Початковий стан — залогінений, якщо в localStorage вже є токен
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("authToken")
   );
 
-  const navigate = useNavigate();
-
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     setIsLoggedIn(false);
-    navigate("/login");
   };
 
-  const handleLoginSuccess = () => {
+  const handleLogin = () => {
     setIsLoggedIn(true);
   };
 
   return (
     <div>
+      {/* Простий navbar */}
       <nav className="navbar">
-        <div className="navbar-brand">Car Maintenance Tracker</div>
-        <div className="navbar-links">
+        <div className="navbar-left">
           <Link to="/">Cars</Link>
           <Link to="/users">Users</Link>
           <Link to="/maintenance">Maintenance</Link>
-          {!isLoggedIn ? (
-            <Link to="/login">Login</Link>
-          ) : (
+        </div>
+
+        <div className="navbar-right">
+          {isLoggedIn ? (
             <button className="btn-secondary" onClick={handleLogout}>
               Logout
             </button>
+          ) : (
+            <Link to="/login">Login</Link>
           )}
         </div>
       </nav>
 
-      <main className="main">
+      {/* Основний контент */}
+      <main>
         <Routes>
           <Route path="/" element={<CarsPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/maintenance" element={<MaintenancePage />} />
           <Route
             path="/login"
-            element={<LoginPage onLogin={handleLoginSuccess} />}
+            element={<LoginPage onLogin={handleLogin} />}
           />
         </Routes>
       </main>
